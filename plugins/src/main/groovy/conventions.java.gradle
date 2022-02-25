@@ -1,0 +1,77 @@
+plugins {
+    id "groovy"
+    id "java"
+    id "jacoco"
+    id "checkstyle"
+    id "conventions.spotless"
+    id "com.github.spotbugs"
+    id "info.solidsoft.pitest"
+}
+
+repositories {
+    mavenCentral()
+}
+
+group = 'com.github.sbstnc.example.otel'
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
+    withSourcesJar()
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+
+test {
+    useJUnitPlatform()
+    finalizedBy jacocoTestReport
+}
+
+tasks.withType(GenerateModuleMetadata) {
+    enabled = false
+}
+
+jacocoTestReport {
+    dependsOn test
+    reports {
+        xml.required = true
+        html.required = true
+    }
+}
+
+checkstyle {
+    toolVersion = "9.2.1"
+}
+
+spotless {
+    java {
+        importOrder()
+        removeUnusedImports()
+        googleJavaFormat()
+    }
+}
+
+dependencies {
+    // Kinda buggy...
+    // spotbugsPlugins "com.h3xstream.findsecbugs:findsecbugs-plugin:1.11.0"
+}
+spotbugs {
+    toolVersion = '4.5.3'
+    ignoreFailures.set(false)
+    effort = 'max'
+    includeFilter.set(file("${rootProject.projectDir}/config/spotbugs/spotbugs-security-include.xml"))
+    excludeFilter.set(file("${rootProject.projectDir}/config/spotbugs/spotbugs-security-include.xml"))
+    maxHeapSize.set('256m')
+}
+
+pitest {
+    junit5PluginVersion = '0.15'
+    failWhenNoMutations = false
+    targetClasses = ['com.github.sbstnc.example.otel.*']
+    outputFormats = ['XML', 'HTML']
+    exportLineCoverage = true
+    timestampedReports = false
+    jvmArgs = ['-Xmx128m']
+}

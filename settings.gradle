@@ -1,0 +1,39 @@
+pluginManagement {
+    plugins {
+        id 'org.springframework.boot' version '2.6.4'
+        id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+        id 'nu.studer.jooq' version '7.1.1'
+        id 'com.google.cloud.tools.jib' version '3.2.0'
+    }
+}
+
+dependencyResolutionManagement {
+    versionCatalogs {
+        libs {
+            version('testcontainers', '1.16.3')
+            version('opentelemetry', '1.11.0')
+            library('jsr305', 'com.google.code.findbugs:jsr305:3.0.2')
+            library('opentelemetry.api', 'io.opentelemetry', 'opentelemetry-api').versionRef('opentelemetry')
+            library('opentelemetry.annotations', 'io.opentelemetry', 'opentelemetry-extension-annotations').versionRef('opentelemetry')
+            library('testcontainers.bom', 'org.testcontainers', 'testcontainers-bom').versionRef('testcontainers')
+        }
+        testLibs {
+            version('spock', '2.0-groovy-3.0')
+            library('guava-testlib', 'com.google.guava:guava-testlib:31.0.1-jre')
+            library('spock.core', 'org.spockframework', 'spock-core').versionRef('spock')
+            library('spock.spring', 'org.spockframework', 'spock-spring').versionRef('spock')
+            library('cglib.nodep', 'cglib:cglib-nodep:3.3.0')
+            library('objenesis', 'org.objenesis:objenesis:3.2')
+        }
+    }
+}
+
+rootProject.name = 'example-spring-otel'
+
+includeBuild '.'
+includeBuild 'plugins'
+
+include 'jooq-generator'
+include 'jooq-models'
+include 'migrations'
+include 'service'

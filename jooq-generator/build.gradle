@@ -1,0 +1,16 @@
+import org.springframework.boot.gradle.plugin.SpringBootPlugin
+
+plugins {
+    id 'org.springframework.boot' apply false
+    id 'conventions.java'
+}
+
+dependencies {
+    implementation platform(SpringBootPlugin.BOM_COORDINATES)
+    implementation platform(libs.testcontainers.bom)
+    implementation 'org.postgresql:postgresql'
+    implementation 'org.liquibase:liquibase-core'
+    implementation 'org.jooq:jooq-meta'
+    implementation 'org.testcontainers:postgresql'
+    implementation 'org.slf4j:slf4j-simple'
+}

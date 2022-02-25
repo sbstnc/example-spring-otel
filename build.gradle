@@ -1,0 +1,47 @@
+plugins {
+    id 'conventions.spotless'
+    id 'org.owasp.dependencycheck' version '6.5.3'
+    id 'nebula.release' version '16.0.0'
+    id 'nebula.maven-publish' version '18.2.0' apply false
+    id 'nebula.contacts' version '6.0.0' apply false
+    id 'nebula.info' version '11.1.0' apply false
+}
+
+subprojects {
+    apply plugin: 'nebula.maven-publish'
+    apply plugin: 'nebula.contacts'
+    apply plugin: 'nebula.info'
+
+    contacts {
+        'ockenfels.fabian@gmail.com' {
+            moniker 'Fabian Ockenfels'
+            github 'sbstnc'
+        }
+    }
+
+    publishing {
+        publications {
+            nebula(MavenPublication) {
+                // remove <dependencyManagement> block from pom
+                pom.withXml {
+                    asNode().dependencyManagement.each { it.replaceNode {} }
+                }
+                pom {
+                    organization {
+                        name = 'sbstnc'
+                        url = 'https://github.com/sbstnc'
+                    }
+                }
+            }
+        }
+    }
+}
+
+dependencyCheck {
+    failBuildOnCVSS = 5
+    analyzers {
+        assemblyEnabled = false
+        centralEnabled = false
+    }
+    skipConfigurations = ['spotbugs']
+}

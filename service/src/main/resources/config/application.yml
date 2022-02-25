@@ -1,0 +1,38 @@
+spring:
+  application:
+    name: example-spring-otel
+  main:
+    banner-mode: off
+  datasource:
+    url: jdbc:postgresql://localhost:5432/example
+    username: test
+    password: test
+  jmx:
+    enabled: true
+  liquibase:
+    enabled: true
+    change-log: classpath:db/changelog-master.xml
+management:
+  endpoint:
+    health:
+      enabled: true
+      probes:
+        enabled: true
+    info:
+      enabled: true
+    metrics:
+      enabled: true
+    prometheus:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+      base-path: '/admin'
+logging:
+  level:
+    root: INFO
+    io.opentelemetry: DEBUG
+    org.jooq.Constants: WARN
+  pattern:
+    console: "%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(%5p) %clr([${spring.application.name},%X{trace_id},%X{span_id}]) %clr(${PID:- }){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m %n%wEx"

@@ -1,0 +1,110 @@
+version: "3.8"
+
+services:
+  loki:
+    image: grafana/loki:2.4.2
+    command: -config.file=/etc/loki/loki-local.yaml
+    ports:
+      - "3100:3100"                                   # loki needs to be exposed so it receives logs
+    environment:
+      - JAEGER_AGENT_HOST=tempo
+      - JAEGER_ENDPOINT=http://tempo:14268/api/traces # send traces to Tempo
+      - JAEGER_SAMPLER_TYPE=const
+      - JAEGER_SAMPLER_PARAM=1
+    volumes:
+      - ./etc/loki-local.yaml:/etc/loki/loki-local.yaml
+      - ./data/loki-data:/tmp/loki
+
+  database:
+    image: postgres:13-alpine
+    restart: always
+    environment:
+      - POSTGRES_DB=example
+      - POSTGRES_USER=test
+      - POSTGRES_PASSWORD=test
+    ports:
+      - "5432:5432"
+
+  tempo:
+    image: grafana/tempo:1.3.1
+    command: [ "-config.file=/etc/tempo.yaml" ]
+    volumes:
+      - ./etc/tempo-local.yaml:/etc/tempo.yaml
+      - ./data/tempo-data:/tmp/tempo
+    ports:
+      - "14268"  # jaeger ingest, Jaeger - Thrift HTTP
+      - "14250"  # Jaeger - GRPC
+      - "55680"  # OpenTelemetry
+      - "3200:3200"   # tempo
+
+  tempo-query:
+    image: grafana/tempo-query:1.3.1
+    command: [ "--grpc-storage-plugin.configuration-file=/etc/tempo-query.yaml" ]
+    volumes:
+      - ./etc/tempo-query.yaml:/etc/tempo-query.yaml
+    ports:
+      - "16686:16686"  # jaeger-ui
+    depends_on:
+      - tempo
+
+  prometheus:
+    image: prom/prometheus:v2.33.4
+    volumes:
+      - ./etc/prometheus.yaml:/etc/prometheus.yaml
+    entrypoint:
+      - /bin/prometheus
+      - --config.file=/etc/prometheus.yaml
+    ports:
+      - "9090:9090"
+
+  grafana:
+    image: grafana/grafana:8.2.6
+    volumes:
+      - ./data/grafana-data/datasources:/etc/grafana/provisioning/datasources
+      - ./data/grafana-data/dashboards-provisioning:/etc/grafana/provisioning/dashboards
+      - ./data/grafana-data/dashboards:/var/lib/grafana/dashboards
+    environment:
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+      - GF_AUTH_DISABLE_LOGIN_FORM=true
+    ports:
+      - "3000:3000"
+    depends_on:
+      - prometheus
+      - tempo-query
+      - loki
+
+  example-spring-otel:
+    image: sbstnc/example-spring-otel
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://database:5432/example
+      JDK_JAVA_OPTIONS: "-Dotel.traces.exporter=jaeger -Dotel.exporter.jaeger.endpoint=http://tempo:14250"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    logging:
+      driver: loki
+      options:
+        loki-url: 'http://host.docker.internal:3100/loki/api/v1/push'
+        loki-pipeline-stages: |
+          - regex:
+              expression: '^(?P<timestamp>\d{4}-\d{2}-\d{2}\s\d{1,2}\:\d{2}\:\d{2}\.\d{3})\s+(?P<level>[A-Z]{4,5})\s[(?P<serviceName>.*),(?P<traceId>.*),(?P<spanId>.*)]\s(?P<pid>\d)\s---\s[\s*(?P<thread>.*)]\s(?P<logger>.*)\s+\:\s(?P<message>.*)$$'
+          - labels:
+              timestamp:
+              level:
+              serviceName:
+              traceId:
+              spanId:
+              pid:
+              thread:
+              logger:
+              message:
+          - static_labels:
+              job: example-spring-otel
+          - timestamp:
+              format: '2006-01-02 15:04:05.000'
+              source: timestamp
+    depends_on:
+      - database
+      - tempo

@@ -1,0 +1,65 @@
+import nu.studer.gradle.jooq.JooqEdition
+import org.springframework.boot.gradle.plugin.SpringBootPlugin
+
+plugins {
+    id 'org.springframework.boot' apply false
+    id 'io.spring.dependency-management'
+    id 'conventions.java'
+    id 'nu.studer.jooq'
+}
+
+dependencies {
+    jooqGenerator project(':jooq-generator')
+    jooqGenerator project(':migrations')
+    jooqGenerator 'org.postgresql:postgresql'
+    compileOnly 'jakarta.validation:jakarta.validation-api'
+}
+
+dependencyManagement {
+    imports {
+        mavenBom SpringBootPlugin.BOM_COORDINATES
+    }
+}
+
+tasks.checkstyleMain.onlyIf { false }
+tasks.spotlessJavaCheck.onlyIf { false }
+
+jooq {
+    version = dependencyManagement.importedProperties['jooq.version']
+    edition = JooqEdition.OSS
+
+    configurations {
+        main {
+            generationTool {
+                logging = org.jooq.meta.jaxb.Logging.WARN
+                generator {
+                    database {
+                        name = 'com.github.sbstnc.example.otel.jooq.LiquibasePostgreSqlDatabase'
+                        inputSchema = 'public'
+                        includes = '.*'
+                        excludes = 'databasechangelog|databasechangeloglock'
+                        recordVersionFields = 'version'
+                        recordTimestampFields = 'updated_at'
+                    }
+                    generate {
+                        relations = true
+                        deprecated = false
+                        records = true
+                        fluentSetters = true
+                        javaTimeTypes = true
+                        validationAnnotations = true
+                    }
+                    target {
+                        packageName = 'com.github.sbstnc.example.otel.db'
+                    }
+                }
+            }
+        }
+    }
+}
+
+tasks.named("generateJooq").configure {
+    inputs.files(project(':migrations').tasks.jar.outputs.files)
+    allInputsDeclared = true
+    outputs.cacheIf { true }
+}

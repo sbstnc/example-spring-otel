@@ -1,0 +1,23 @@
+plugins {
+    id "com.diffplug.spotless"
+}
+
+spotless {
+    groovyGradle {
+        target '*.gradle', 'gradle/*.gradle'
+    }
+    format 'dotfiles', {
+        target '*.md', '.gitignore', '.gitattributes'
+
+        trimTrailingWhitespace()
+        indentWithSpaces(2)
+        endWithNewline()
+    }
+    format 'markdown', {
+        target '*.md'
+
+        trimTrailingWhitespace()
+        indentWithSpaces(2)
+        endWithNewline()
+    }
+}
