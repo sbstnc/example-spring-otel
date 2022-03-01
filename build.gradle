@@ -4,7 +4,7 @@ plugins {
     id 'nebula.release' version '16.0.0'
     id 'nebula.maven-publish' version '18.4.0' apply false
     id 'nebula.contacts' version '6.0.0' apply false
-    id 'nebula.info' version '11.1.0' apply false
+    id 'nebula.info' version '11.3.3' apply false
 }
 
 subprojects {
