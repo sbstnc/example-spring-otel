@@ -19,7 +19,7 @@ dependencyResolutionManagement {
         }
         testLibs {
             version('spock', '2.0-groovy-3.0')
-            library('guava-testlib', 'com.google.guava:guava-testlib:31.0.1-jre')
+            library('guava-testlib', 'com.google.guava:guava-testlib:31.1-jre')
             library('spock.core', 'org.spockframework', 'spock-core').versionRef('spock')
             library('spock.spring', 'org.spockframework', 'spock-spring').versionRef('spock')
             library('cglib.nodep', 'cglib:cglib-nodep:3.3.0')
