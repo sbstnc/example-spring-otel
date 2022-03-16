@@ -1,10 +1,10 @@
 plugins {
     id 'conventions.spotless'
-    id 'org.owasp.dependencycheck' version '7.1.1'
-    id 'nebula.release' version '16.0.0'
-    id 'nebula.maven-publish' version '18.4.0' apply false
-    id 'nebula.contacts' version '6.0.0' apply false
-    id 'nebula.info' version '11.3.3' apply false
+    id 'org.owasp.dependencycheck'
+    id 'nebula.release'
+    id 'nebula.maven-publish' apply false
+    id 'nebula.contacts' apply false
+    id 'nebula.info' apply false
 }
 
 subprojects {

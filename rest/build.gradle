@@ -1,0 +1,72 @@
+plugins {
+    id 'org.springframework.boot'
+    id 'io.spring.dependency-management'
+    id 'conventions.java'
+    id 'com.google.cloud.tools.jib'
+}
+
+configurations {
+    agent
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+dependencies {
+    agent libs.opentelemetry.javaagent
+    implementation libs.opentelemetry.api
+    implementation libs.opentelemetry.annotations
+
+    annotationProcessor 'org.projectlombok:lombok'
+    compileOnly 'org.projectlombok:lombok'
+
+    implementation project(':core')
+    implementation project(':persistence')
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'org.springframework.boot:spring-boot-starter-hateoas'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    runtimeOnly 'io.micrometer:micrometer-registry-prometheus'
+
+    testImplementation "org.spockframework:spock-spring"
+    testImplementation testLibs.spock.core
+    testImplementation testLibs.spock.spring
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
+
+task downloadAgent(type: Copy) {
+    from configurations.agent
+    rename('(.*)-.*(.jar)', '$1$2')
+    into 'agent/'
+}
+
+tasks.processResources.finalizedBy tasks.downloadAgent
+
+jib {
+    from {
+        image = 'gcr.io/distroless/java:11@sha256:293896be60077932ba49824f0a997371244edac41dcb01ea7b8eac91da7b4be7'
+    }
+    to {
+        image = 'sbstnc/example-spring-otel'
+    }
+    container {
+        ports = ['8080']
+        jvmFlags = [
+            '-XX:InitialRAMPercentage=80.0',
+            '-XX:MaxRAMPercentage=80.0',
+            '-Dotel.metrics.exporter=none',
+            "-Dotel.resource.attributes=rest.name=${rootProject.name}".toString(),
+            '-Dotel.javaagent.debug=false',
+            '-javaagent:/app/agent/opentelemetry-javaagent.jar',
+        ]
+    }
+    extraDirectories {
+        paths {
+            path {
+                from = 'agent'
+                into = '/app/agent'
+                permissions = ['*.jar': '644']
+            }
+        }
+    }
+}

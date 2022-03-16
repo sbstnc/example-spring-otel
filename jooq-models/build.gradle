@@ -50,7 +50,7 @@ jooq {
                         validationAnnotations = true
                     }
                     target {
-                        packageName = 'com.github.sbstnc.example.otel.db'
+                        packageName = 'com.github.sbstnc.example.otel.todo.db'
                     }
                 }
             }

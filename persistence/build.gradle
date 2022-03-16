@@ -1,0 +1,31 @@
+import org.springframework.boot.gradle.plugin.SpringBootPlugin
+
+plugins {
+    id 'org.springframework.boot' apply false
+    id 'io.spring.dependency-management'
+    id 'conventions.library'
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+dependencies {
+    annotationProcessor 'org.projectlombok:lombok'
+    compileOnly 'org.projectlombok:lombok'
+    implementation 'org.springframework.boot:spring-boot-starter'
+    implementation 'org.springframework.boot:spring-boot-starter-jooq'
+    implementation project(':migrations')
+    implementation project(':jooq-models')
+    implementation project(':spi')
+    runtimeOnly 'org.liquibase:liquibase-core'
+    runtimeOnly 'org.postgresql:postgresql'
+}
+
+dependencyManagement {
+    imports {
+        mavenBom SpringBootPlugin.BOM_COORDINATES
+    }
+}

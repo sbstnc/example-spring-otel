@@ -2,6 +2,11 @@ pluginManagement {
     plugins {
         id 'org.springframework.boot' version '2.7.1'
         id 'io.spring.dependency-management' version '1.0.12.RELEASE'
+        id 'org.owasp.dependencycheck' version '7.1.1'
+        id 'nebula.release' version '16.0.0'
+        id 'nebula.maven-publish' version '18.4.0'
+        id 'nebula.contacts' version '6.0.0'
+        id 'nebula.info' version '11.3.3'
         id 'nu.studer.jooq' version '7.1.1'
         id 'com.google.cloud.tools.jib' version '3.2.1'
     }
@@ -10,11 +15,16 @@ pluginManagement {
 dependencyResolutionManagement {
     versionCatalogs {
         libs {
-            version('testcontainers', '1.16.3')
-            version('opentelemetry', '1.11.0')
+            version('testcontainers', '1.17.3')
+            version('opentelemetry', '1.15.0')
+            version('picocli', '4.6.3')
             library('jsr305', 'com.google.code.findbugs:jsr305:3.0.2')
             library('opentelemetry.api', 'io.opentelemetry', 'opentelemetry-api').versionRef('opentelemetry')
             library('opentelemetry.annotations', 'io.opentelemetry', 'opentelemetry-extension-annotations').versionRef('opentelemetry')
+            library('opentelemetry.javaagent', 'io.opentelemetry.javaagent', 'opentelemetry-javaagent').versionRef('opentelemetry')
+            library('picocli', 'info.picocli', 'picocli').versionRef('picocli')
+            library('picocli.spring', 'info.picocli', 'picocli-spring-boot-starter').versionRef('picocli')
+            library('picocli.codegen', 'info.picocli', 'picocli-codegen').versionRef('picocli')
             library('testcontainers.bom', 'org.testcontainers', 'testcontainers-bom').versionRef('testcontainers')
         }
         testLibs {
@@ -33,7 +43,13 @@ rootProject.name = 'example-spring-otel'
 includeBuild '.'
 includeBuild 'plugins'
 
+include 'api'
+include 'cli'
+include 'core'
+include 'domain'
 include 'jooq-generator'
 include 'jooq-models'
+include 'persistence'
 include 'migrations'
-include 'service'
+include 'rest'
+include 'spi'
