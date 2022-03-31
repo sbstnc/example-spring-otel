@@ -2,7 +2,7 @@ plugins {
     id 'org.springframework.boot'
     id 'io.spring.dependency-management'
     id 'conventions.java'
-    id 'com.google.cloud.tools.jib' version '3.2.0'
+    id 'com.google.cloud.tools.jib' version '3.2.1'
 }
 
 configurations {
