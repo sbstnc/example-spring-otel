@@ -1,6 +1,6 @@
 pluginManagement {
     plugins {
-        id 'org.springframework.boot' version '2.6.6'
+        id 'org.springframework.boot' version '2.6.7'
         id 'io.spring.dependency-management' version '1.0.11.RELEASE'
         id 'nu.studer.jooq' version '7.1.1'
         id 'com.google.cloud.tools.jib' version '3.2.1'
