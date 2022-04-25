@@ -13,7 +13,7 @@ configurations {
 }
 
 dependencies {
-    agent 'io.opentelemetry.javaagent:opentelemetry-javaagent:1.13.0'
+    agent 'io.opentelemetry.javaagent:opentelemetry-javaagent:1.13.1'
     implementation libs.opentelemetry.api
     implementation libs.opentelemetry.annotations
 
