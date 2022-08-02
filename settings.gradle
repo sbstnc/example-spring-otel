@@ -33,7 +33,7 @@ dependencyResolutionManagement {
             library('spock.core', 'org.spockframework', 'spock-core').versionRef('spock')
             library('spock.spring', 'org.spockframework', 'spock-spring').versionRef('spock')
             library('cglib.nodep', 'cglib:cglib-nodep:3.3.0')
-            library('objenesis', 'org.objenesis:objenesis:3.2')
+            library('objenesis', 'org.objenesis:objenesis:3.3')
         }
     }
 }
