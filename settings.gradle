@@ -1,7 +1,7 @@
 pluginManagement {
     plugins {
         id 'org.springframework.boot' version '2.7.3'
-        id 'io.spring.dependency-management' version '1.0.13.RELEASE'
+        id 'io.spring.dependency-management' version '1.0.14.RELEASE'
         id 'org.owasp.dependencycheck' version '7.2.0'
         id 'nebula.release' version '16.1.0'
         id 'nebula.maven-publish' version '18.4.0'
