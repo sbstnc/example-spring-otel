@@ -46,7 +46,7 @@ tasks.processResources.finalizedBy tasks.downloadAgent
 
 jib {
     from {
-        image = 'gcr.io/distroless/java:11@sha256:293896be60077932ba49824f0a997371244edac41dcb01ea7b8eac91da7b4be7'
+        image = 'gcr.io/distroless/java17:nonroot@sha256:a32063ab4dbb0c3fdd89f4e9989ed6d268f3b399fd17ff64ff94fe54256027ca'
     }
     to {
         image = 'sbstnc/example-spring-otel'
