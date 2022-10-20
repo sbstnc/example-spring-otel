@@ -1,12 +1,12 @@
 pluginManagement {
     plugins {
         id 'org.springframework.boot' version '2.7.4'
-        id 'io.spring.dependency-management' version '1.0.14.RELEASE'
-        id 'org.owasp.dependencycheck' version '7.2.1'
-        id 'nebula.release' version '16.1.0'
-        id 'nebula.maven-publish' version '18.4.0'
-        id 'nebula.contacts' version '6.0.0'
-        id 'nebula.info' version '11.4.1'
+        id 'io.spring.dependency-management' version '1.1.0'
+        id 'org.owasp.dependencycheck' version '7.3.0'
+        id 'com.netflix.nebula.release' version '17.0.1'
+        id 'com.netflix.nebula.maven-nebula-publish' version '19.0.0'
+        id 'com.netflix.nebula.contacts' version '7.0.0'
+        id 'com.netflix.nebula.info' version '12.0.0'
         id 'nu.studer.jooq' version '7.1.1'
         id 'com.google.cloud.tools.jib' version '3.3.0'
     }

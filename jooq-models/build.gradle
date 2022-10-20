@@ -58,8 +58,6 @@ jooq {
     }
 }
 
-tasks.named("generateJooq").configure {
-    inputs.files(project(':migrations').tasks.jar.outputs.files)
+tasks.named('generateJooq').configure {
     allInputsDeclared = true
-    outputs.cacheIf { true }
 }

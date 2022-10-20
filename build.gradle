@@ -1,16 +1,16 @@
 plugins {
     id 'conventions.spotless'
     id 'org.owasp.dependencycheck'
-    id 'nebula.release'
-    id 'nebula.maven-publish' apply false
-    id 'nebula.contacts' apply false
-    id 'nebula.info' apply false
+    id 'com.netflix.nebula.release'
+    id 'com.netflix.nebula.maven-nebula-publish' apply false
+    id 'com.netflix.nebula.contacts' apply false
+    id 'com.netflix.nebula.info' apply false
 }
 
 subprojects {
-    apply plugin: 'nebula.maven-publish'
-    apply plugin: 'nebula.contacts'
-    apply plugin: 'nebula.info'
+    apply plugin: 'com.netflix.nebula.maven-nebula-publish'
+    apply plugin: 'com.netflix.nebula.contacts'
+    apply plugin: 'com.netflix.nebula.info'
 
     contacts {
         'ockenfels.fabian@gmail.com' {
