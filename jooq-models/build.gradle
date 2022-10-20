@@ -4,7 +4,7 @@ import org.springframework.boot.gradle.plugin.SpringBootPlugin
 plugins {
     id 'org.springframework.boot' apply false
     id 'io.spring.dependency-management'
-    id 'conventions.java'
+    id 'conventions.library'
     id 'nu.studer.jooq'
 }
 

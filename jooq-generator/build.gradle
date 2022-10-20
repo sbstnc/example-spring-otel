@@ -2,7 +2,7 @@ import org.springframework.boot.gradle.plugin.SpringBootPlugin
 
 plugins {
     id 'org.springframework.boot' apply false
-    id 'conventions.java'
+    id 'conventions.library'
 }
 
 dependencies {
