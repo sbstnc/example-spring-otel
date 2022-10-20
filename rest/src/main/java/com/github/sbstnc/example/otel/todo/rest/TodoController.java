@@ -3,6 +3,9 @@ package com.github.sbstnc.example.otel.todo.rest;
 import static java.util.stream.Collectors.toList;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
+import static org.springframework.http.ResponseEntity.created;
+import static org.springframework.http.ResponseEntity.noContent;
+import static org.springframework.http.ResponseEntity.ok;
 
 import com.github.sbstnc.example.otel.todo.api.CreateTodoCommand;
 import com.github.sbstnc.example.otel.todo.api.CreateTodoUseCase;
@@ -41,11 +44,7 @@ public class TodoController {
 
   @PostMapping
   public ResponseEntity<EntityModel<TodoResponse>> addTodo(@RequestBody TodoRequest request) {
-    log.info("Creating new todo");
-    var todo =
-        createTodoUseCase.createTodo(new CreateTodoCommand(UUID.randomUUID(), request.getTitle()));
-    final var em = assembler.toModel(responseMapper.map(todo));
-    return ResponseEntity.created(em.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(em);
+    return createTodo(request);
   }
 
   @GetMapping
@@ -58,18 +57,17 @@ public class TodoController {
             .collect(toList());
     final var cm =
         CollectionModel.of(todos, linkTo(methodOn(TodoController.class).getTodos()).withSelfRel());
-    return ResponseEntity.ok().body(cm);
+    return ok(cm);
   }
 
   @GetMapping("/{id}")
   public ResponseEntity<EntityModel<TodoResponse>> getTodo(@PathVariable UUID id) {
     log.info("Fetching todo {}", id);
-    return getTodoUseCase
-        .findById(new GetTodoByIdQuery(id))
-        .map(responseMapper::map)
-        .map(assembler::toModel)
-        .map(model -> ResponseEntity.ok().body(model))
-        .orElseGet(() -> ResponseEntity.notFound().build());
+    return ResponseEntity.of(
+        getTodoUseCase
+            .findById(new GetTodoByIdQuery(id))
+            .map(responseMapper::map)
+            .map(assembler::toModel));
   }
 
   @PutMapping("/{id}")
@@ -77,50 +75,49 @@ public class TodoController {
       @RequestBody TodoRequest request, @PathVariable UUID id) {
     log.info("Updating todo {}", id);
     final var title = request.getTitle();
-    final var todo =
-        updateTodoUseCase
-            .updateTodoTitle(new UpdateTodoTitleCommand(id, title))
-            .orElseGet(() -> createTodoUseCase.createTodo(new CreateTodoCommand(id, title)));
-    final var em = assembler.toModel(responseMapper.map(todo));
-    return ResponseEntity.created(em.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(em);
+    return updateTodoUseCase
+        .updateTodoTitle(new UpdateTodoTitleCommand(id, title))
+        .map(responseMapper::map)
+        .map(assembler::toModel)
+        .map(ResponseEntity::ok)
+        .orElseGet(() -> createTodo(id, request));
   }
 
   @PutMapping("/{id}/pending")
   public ResponseEntity<EntityModel<TodoResponse>> pending(@PathVariable UUID id) {
     log.info("Mark todo {} as pending", id);
-    return updateTodoUseCase
-        .markTodoPending(id)
-        .map(responseMapper::map)
-        .map(assembler::toModel)
-        .map(model -> ResponseEntity.ok().body(model))
-        .orElseGet(() -> ResponseEntity.notFound().build());
+    return ResponseEntity.of(
+        updateTodoUseCase.markTodoPending(id).map(responseMapper::map).map(assembler::toModel));
   }
 
   @PutMapping("/{id}/in-progress")
   public ResponseEntity<EntityModel<TodoResponse>> inProgress(@PathVariable UUID id) {
     log.info("Mark todo {} as in progress", id);
-    return updateTodoUseCase
-        .markTodoInProgress(id)
-        .map(responseMapper::map)
-        .map(assembler::toModel)
-        .map(model -> ResponseEntity.ok().body(model))
-        .orElseGet(() -> ResponseEntity.notFound().build());
+    return ResponseEntity.of(
+        updateTodoUseCase.markTodoInProgress(id).map(responseMapper::map).map(assembler::toModel));
   }
 
   @PutMapping("/{id}/done")
   public ResponseEntity<EntityModel<TodoResponse>> done(@PathVariable UUID id) {
     log.info("Mark todo {} as done", id);
-    return updateTodoUseCase
-        .markTodoDone(id)
-        .map(responseMapper::map)
-        .map(assembler::toModel)
-        .map(model -> ResponseEntity.ok().body(model))
-        .orElseGet(() -> ResponseEntity.notFound().build());
+    return ResponseEntity.of(
+        updateTodoUseCase.markTodoDone(id).map(responseMapper::map).map(assembler::toModel));
   }
 
   @DeleteMapping("/{id}")
   ResponseEntity<Void> deleteTodo(@PathVariable UUID id) {
     deleteTodoUseCase.deleteTodo(id);
-    return ResponseEntity.noContent().build();
+    return noContent().build();
+  }
+
+  private ResponseEntity<EntityModel<TodoResponse>> createTodo(TodoRequest request) {
+    return createTodo(UUID.randomUUID(), request);
+  }
+
+  private ResponseEntity<EntityModel<TodoResponse>> createTodo(UUID id, TodoRequest request) {
+    log.info("Creating new todo");
+    var todo = createTodoUseCase.createTodo(new CreateTodoCommand(id, request.getTitle()));
+    final var em = assembler.toModel(responseMapper.map(todo));
+    return created(em.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(em);
   }
 }

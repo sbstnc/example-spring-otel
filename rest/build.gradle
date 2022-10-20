@@ -28,10 +28,12 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     runtimeOnly 'io.micrometer:micrometer-registry-prometheus'
 
+    testImplementation platform(libs.testcontainers.bom)
     testImplementation "org.spockframework:spock-spring"
     testImplementation testLibs.spock.core
     testImplementation testLibs.spock.spring
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.testcontainers:postgresql'
 }
 
 task downloadAgent(type: Copy) {
